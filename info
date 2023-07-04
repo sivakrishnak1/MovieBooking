@@ -1,0 +1,111 @@
+++++++++++++++++++++++++++++++++++++++
+--[[PartnerService]]: 
+
+1. Theater partners can add/update/delete/ theaters and view
+	POST /partner/theater/    **low**
+		add theater
+	GET /partner/theater/{theaterid} **low**
+	    get theater details  
+	DELETE /partner/theater/{theaterid} **low**
+		delete theater
+	PUT /partner/theater/{theaterid}  **low**
+	     update theater details	
+
+	 THEATER: [theaterId serial primarykey| name varchar(30) | city varchar(20)| address varchar(100) | isActive boolean default Yes] 
+		- theater will have shows (for a movie)
+	 THEATER_SEATS [seatid primarykey, theaterid foriegnkey, rowno varchar(2), columnno varchar(2) , isActive boolean]
+	 	- one theater can have multiple seats (THEATER**one-many**THEATER_SEATS)
+
+	
+2. Theater partners can add shows for the day
+	- show will have theaterid, movie, date, starttime,  
+     
+     MOVIE(id  serial primarykey, language varchar(10), description text
+     SHOW: [id serial primary key| movieid int fkey references movie(id) | theaterid int fkey references theater(id) | date DATE NOT NULL, starttime Time , duration int ]  
+		- theater can have multiple shows (THEATER**one-many**SHOW)
+		- show will have multiple tickets (SHOW**one-many**TICKET)
+
+	
+	
+     TICKET (id serial primary key | showid int foreign key references show(id) |   status varchar (10) | booking_id 
+    	- 
+    	- tickets to be booked are generated 
+     
+     USER (userid, serial primary key | fullname varchar(30), | mobileno varchar(10) | emailid varchar(20) | isActive boolean) 
+     	- user can have multiple booking (USER**one-many**BOOKING)
+     
+     Booking (bookingid serial primary key | userid int foreign key USER(id) | 
+		- booking can have multiple tickets (BOOKING**one-many**Tickets)
+		- booking is for single user,  (BOOKING**one-one**USER)
+
+GET /movie/tickets/
+	- search in TICKET table for availablility
+
+POST /partners/theater/{theaterid}/shows 
+	- add/update/delete shows for the day
+	- should add new SHOWS for the given theater
+	    INSERT INTO SHOWS ( showid, theaterid, date, starttime, duration)
+		POST /partners/theater/{theaterid}/shows/{showid}/tickets
+			- add tickets for the show (this should be the total of capacity of the theater)
+			- total no of rows to be added here should match with THEATER_SEATS FOR THE Theaterid 	    	
+	    
+    
+
+++++++++++++++++++++++++++++++++++++++++
+
+
+
+ ++++Movie Ticket Booking Platform
+FR:
+1. Enable theater partners to onboard theaters
+2. Enable customers to browse and book tickets in advance
+
+NFR: 
+1. High availability
+2. High consistency during booking process
+
++++++
+1. Movie is a dynamic field
+++++
+
+POST /partner/theater    --> Onboard a new theater 
+POST /partner/theater/{theaterId}/shows/{showId} -> update shows ex. movie
+                                      
+{"theater": 
+    {"name" : "manasa", "city" : "kavali", "address" : "kalugolammapet", "theaterseats" : {}, "theater_shows": {}}
+} 
+
+DB Modelling:
+[[[Onboarding]]]    
+    1. theater will have seats, theater will have shows , shows have movie, starttime,endtime, isActive
+    
+        THEATER: [theaterId int primarykey| city varchar(20)| address varchar(100) | isActive boolean default Yes] 
+        THEATERSEATS: [seatid int primarykey| theaterId int foriegnkey| rowNo int | columnNo int | category varchar | isActive boolean]
+       // THEATERSHOWS: [showid int primarykey| theaterId int foriegnkey| movieid int| starttime datatime| endtime datetime | isActive boolean ]
+
+[[[Theater can Add/update/delete shows for the day]]]
+  Application should make bookings available for next one week -> provision bookings
+  
+POST /partner/theaters/{theaterid}/shows/{july1}
+    {"description" : "", "movie" : "moviename", "starttime": "startime", "isActive": "yes"}
+    SHOWS: [showid int primarykey| theaterid foriegnkey| starttime datetime| endtime datetime| day varchar| isActive boolean default Yes ]
+        123| "manasa_id"| 10AM| 12.30PM| july1| Y  -> Add a show1 for the day "july1" for theater "manasa"
+        124| "manasa_id"| 03PM| 05.30PM| july1| Y  -> update a show2 for the day "july1" for theater "manasa"
+        133| "latha_id" | 11AM| 01:00PM| july1| Y  -> Add a show1 for the day "july1" for theater "latha"
+        135| "latha_id" | 06PM| 09.30PM| july1| N  -> delete a show3 for the day "july1" for theater "latha"
+        
+    TICKETS: [ticketid int primarykey | showid foriegnkey | isBooked boolean default No  ]
+          look up on table (theaterseats) and provision tickets with isBooked = N    
+
+          
+
+[[[]]]  
+    TICKETSHOW []    
+        
+    BOOKING : [bookingid int primarykey| ticketid foriegnKey | time datatime| status (CREATED|COMPLETE|CANCELLED) ]
+
+
+
+
+
+[[[ticket booking]]]
