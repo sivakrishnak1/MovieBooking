@@ -1,0 +1,82 @@
+
+
+postgres=# \d
+                  List of relations
+ Schema |         Name          |   Type   |  Owner
+--------+-----------------------+----------+----------
+ public | movie                 | table    | postgres
+ public | movie_id_seq          | sequence | postgres
+ public | show                  | table    | postgres
+ public | show_id_seq           | sequence | postgres
+ public | theater               | table    | postgres
+ public | theater_seats         | table    | postgres
+ public | theater_seats_id_seq  | sequence | postgres
+ public | theater_theaterid_seq | sequence | postgres
+
+# \d theater
+                                        Table "public.theater"
+  Column  |          Type          | Collation | Nullable |                  Default
+----------+------------------------+-----------+----------+--------------------------------------------
+ id       | integer                |           | not null | nextval('theater_theaterid_seq'::regclass)
+ city     | character varying(20)  |           |          |
+ address  | character varying(100) |           |          |
+ isactive | boolean                |           |          | false
+ name     | character varying(30)  |           |          |
+ capacity | integer                |           |          |
+Indexes:
+    "theater_pkey" PRIMARY KEY, btree (id)
+Referenced by:
+    TABLE "show" CONSTRAINT "show_fkey_theaterid" FOREIGN KEY (theaterid) REFERENCES theater(id)
+    TABLE "theater_seats" CONSTRAINT "theater_seats_fkey" FOREIGN KEY (theaterid) REFERENCES theater(id) ON UPDATE CASCADE ON DELETE CASCADE
+
+postgres=#
+
+# \d movie
+                                      Table "public.movie"
+   Column    |         Type          | Collation | Nullable |              Default
+-------------+-----------------------+-----------+----------+-----------------------------------
+ id          | integer               |           | not null | nextval('movie_id_seq'::regclass)
+ language    | character varying(10) |           |          |
+ description | text                  |           |          |
+ title       | character varying(30) |           |          |
+ duration    | integer               |           |          |
+Indexes:
+    "movie_pkey" PRIMARY KEY, btree (id)
+Referenced by:
+    TABLE "show" CONSTRAINT "show_fkey_movieid" FOREIGN KEY (movieid) REFERENCES movie(id)
+
+postgres=#
+
+
+
+ \d theater_seats
+                                    Table "public.theater_seats"
+  Column   |         Type         | Collation | Nullable |                  Default
+-----------+----------------------+-----------+----------+-------------------------------------------
+ id        | integer              |           | not null | nextval('theater_seats_id_seq'::regclass)
+ theaterid | integer              |           |          |
+ rowpos    | character varying(2) |           |          |
+ columnpos | character varying(2) |           |          |
+ isactive  | boolean              |           |          |
+Indexes:
+    "theater_seats_pkey" PRIMARY KEY, btree (id)
+Foreign-key constraints:
+    "theater_seats_fkey" FOREIGN KEY (theaterid) REFERENCES theater(id) ON UPDATE CASCADE ON DELETE CASCADE
+
+
+ \d show
+                                     Table "public.show"
+  Column   |          Type          | Collation | Nullable |             Default
+-----------+------------------------+-----------+----------+----------------------------------
+ id        | integer                |           | not null | nextval('show_id_seq'::regclass)
+ movieid   | integer                |           |          |
+ theaterid | integer                |           |          |
+ day       | date                   |           | not null |
+ starttime | time without time zone |           | not null |
+Indexes:
+    "show_pkey" PRIMARY KEY, btree (id)
+Foreign-key constraints:
+    "show_fkey_movieid" FOREIGN KEY (movieid) REFERENCES movie(id)
+    "show_fkey_theaterid" FOREIGN KEY (theaterid) REFERENCES theater(id)
+
+postgres=#
