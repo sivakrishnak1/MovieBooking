@@ -15,9 +15,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.project.moviebooking.model.Show;
+import com.project.moviebooking.model.Theater;
 import com.project.moviebooking.repository.MovieRepository;
 import com.project.moviebooking.repository.ShowRepository;
 import com.project.moviebooking.repository.TheaterRepository;
@@ -41,4 +43,11 @@ public class TheaterController {
 		return showRepo.findAllByTheater(theaterRepo.findById(theaterId).get());
 	}
 
+	@GetMapping()
+	public List<Theater> GetTheatersForCity(@RequestParam(required = false) String city) {
+		if (city == null) {
+			return theaterRepo.findAll();
+		}
+		return theaterRepo.findByCity(city);
+	}
 }

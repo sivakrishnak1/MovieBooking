@@ -13,7 +13,7 @@
 
 	 THEATER: [theaterId serial primarykey| name varchar(30) | city varchar(20)| address varchar(100) | isActive boolean default Yes] 
 		- theater will have shows (for a movie)
-	 THEATER_SEATS [seatid primarykey, theaterid foriegnkey, rowno varchar(2), columnno varchar(2) , isActive boolean]
+	 THEATER_SEATS [seatid primarykey, theaterid foreignkey, seatno int, isActive boolean]
 	 	- one theater can have multiple seats (THEATER**one-many**THEATER_SEATS)
 
 	
@@ -105,7 +105,9 @@ POST /partner/theaters/{theaterid}/shows/{july1}
     BOOKING : [bookingid int primarykey| ticketid foriegnKey | time datatime| status (CREATED|COMPLETE|CANCELLED) ]
 
 
-
-
-
-[[[ticket booking]]]
+---USECASE: 
+ 	-user to search shows for movies & city (movieid & theaterid(contains city) -> shows (showid) :valid search record
+ 		- search for showid containing tickets in SHOW_TICKET
+ 		SHOW_TICKET(id serial primary key, showid fk references show(id), seatno fk references theater_seats(id)
+ 						status varchar(10) - created/booked/complete)
+ 	-
